@@ -22,7 +22,7 @@ app.use(function(req, res, next){
 })
 
 // API
-//app.use('/api/heroes', require('./api/heroes'));
+app.use('/api/users', require('./api/users'));
 
 // Port setting
 var port = 3000;
