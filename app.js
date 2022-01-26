@@ -3,7 +3,6 @@ const bodyParser = require('body-parser');
 const app = express();
 
 const models = require("./models/index.js");
-
 models.sequelize.sync().then( () => {
     console.log(" DB 연결 성공");
 }).catch(err => {
@@ -23,6 +22,7 @@ app.use(function(req, res, next){
 
 // API
 app.use('/api/users', require('./api/users'));
+app.use('/api/studies', require('./api/studies'));
 
 // Port setting
 var port = 3000;
