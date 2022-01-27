@@ -30,48 +30,82 @@ router.post('/', async (req, res, next) => {
 
 router.post('/join', async (req, res, next) => {
 
+    // check the study is on going recruiting
     const is_recruit = await models.study.findAll({
         attributes: ['is_recruit'],
         where: {
             id: req.body.study_id
         }
     })
-
+    
     if (is_recruit[0].is_recruit == true){
         // TODO => if I am already in study 
 
-        // join me!
-        const new_join = await models.user_study.create({
-            user_id: req.body.user_id,
-            study_id: req.body.study_id
-        })
-
-        // update study_member
-        const update = await models.study.increment(
-            {member_number: 1},{ where: { id: req.body.study_id } });
-
-        // if study_member is full then set is_recruit false!
-        const check = await models.study.findAll({
-            attributes: ['member_number'],
+        const already_in = await models.user_study.findAll({
+            attributes: ['study_id'],
             where: {
-                id: req.body.study_id
+                user_id: req.body.user_id
             }
-        })
+        }).then(accounts => accounts.map(account => account.study_id));
 
-        if (check[0].member_number >= 4){
-            await models.study.update(
-                { is_recruit: false },
-                { where: { id: req.body.study_id} }
-            )
+        console.log(already_in)
+
+        if (already_in.includes(String(req.body.study_id))){
+            res.send({message: 'YOU ARE ALREADY IN STUDY'});
         }
-    
-        res.json(new_join);
+        else{
+            // join me!
+            const new_join = await models.user_study.create({
+                user_id: req.body.user_id,
+                study_id: req.body.study_id
+            })
+
+            // update study_member
+            const update = await models.study.increment(
+                {member_number: 1},{ where: { id: req.body.study_id } });
+
+            // if study_member is full then set is_recruit false!
+            const check = await models.study.findAll({
+                attributes: ['member_number'],
+                where: {
+                    id: req.body.study_id
+                }
+            })
+            if (check[0].member_number >= 4){
+                await models.study.update(
+                    { is_recruit: false },
+                    { where: { id: req.body.study_id} }
+                )
+            }
+            res.json(new_join);
+        }
     }
     else{
         res.send({message: 'STUDY IS ALREADY FULL'});
     }
 })
 
+router.get('/me', async (req, res, next) => {
 
+    // show the study list
+    const my_study_ids = await models.user_study.findAll({
+        attributes: ['study_id'],
+        where: {
+            user_id: "aaaa@efgh.com"
+        }
+    }).then(accounts => accounts.map(account => account.study_id));
+
+    console.log(my_study_ids)
+
+    // find from the user_study
+    const my_studies = await models.user_study.findAll({
+        where: {
+            id: my_study_ids
+        }
+    })    
+    
+    // send back res
+    res.json(my_studies);
+})
 
 module.exports = router;
