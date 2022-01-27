@@ -4,8 +4,7 @@ module.exports = ((sequelize, DataTypes)=>{
         "user",
         {
             id:{
-                type: Sequelize.INTEGER,
-                autoIncrement: true,
+                type: Sequelize.STRING(40),
                 primaryKey: true,
             },           
             email:{

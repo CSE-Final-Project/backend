@@ -30,22 +30,22 @@ module.exports = ((sequelize, DataTypes)=>{
             },
             member_number: {
                 type: Sequelize.INTEGER,
-                allowNull: false,
+                defaultValue: 1,
             },
             penalty: {
                 type: Sequelize.INTEGER,
                 allowNull: false,
             },
             date_created: {
-                type: Sequelize.DATEONLY,
-                allowNull: false,
+                type: DataTypes.DATE,
+                defalutValue: Sequelize.literal('now()'),
             },
             is_recruit: {
                 type: Sequelize.BOOLEAN,
-                allowNull: false,
+                defaultValue: true,
             },
             info: {
-                type: Sequelize.STRING(40),
+                type: Sequelize.STRING(255),
             }
         },
         {

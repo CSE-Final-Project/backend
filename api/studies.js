@@ -1,6 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const models = require('../models/index')
+const { v4: uuidV4 } = require('uuid');
 
 // TODO ==> 향후 get은 필요없다
 router.get('/', async (req, res, next) => {
@@ -14,11 +15,8 @@ router.post('/', async (req, res, next) => {
         title: req.body.title,
         topic: req.body.topic,
         target_time: req.body.target_time,
-        addr: req.body.addr, // TODO ==> server에서 UUID로 생성!
-        member_number: 1,
+        addr: uuidV4(),
         penalty: req.body.penalty,
-        date_created: req.body.date_created, // TODO ==> server 시간 기준!
-        is_recruit: 1,
         info: req.body.info,
     }).then(console.log())
 
