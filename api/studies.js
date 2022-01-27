@@ -28,4 +28,50 @@ router.post('/', async (req, res, next) => {
     res.json(user_join_study);
 })
 
+router.post('/join', async (req, res, next) => {
+
+    const is_recruit = await models.study.findAll({
+        attributes: ['is_recruit'],
+        where: {
+            id: req.body.study_id
+        }
+    })
+
+    if (is_recruit[0].is_recruit == true){
+        // TODO => if I am already in study 
+
+        // join me!
+        const new_join = await models.user_study.create({
+            user_id: req.body.user_id,
+            study_id: req.body.study_id
+        })
+
+        // update study_member
+        const update = await models.study.increment(
+            {member_number: 1},{ where: { id: req.body.study_id } });
+
+        // if study_member is full then set is_recruit false!
+        const check = await models.study.findAll({
+            attributes: ['member_number'],
+            where: {
+                id: req.body.study_id
+            }
+        })
+
+        if (check[0].member_number >= 4){
+            await models.study.update(
+                { is_recruit: false },
+                { where: { id: req.body.study_id} }
+            )
+        }
+    
+        res.json(new_join);
+    }
+    else{
+        res.send({message: 'STUDY IS ALREADY FULL'});
+    }
+})
+
+
+
 module.exports = router;
