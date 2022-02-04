@@ -3,10 +3,14 @@ module.exports = ((sequelize, DataTypes)=>{
     return sequelize.define(
         "study",
         {
-            id:{
-                type: Sequelize.INTEGER,
+            idx:{ // PK
+                type: Sequelize.BIGINT(11),
                 autoIncrement: true,
                 primaryKey: true,
+            },
+            id:{ // TO DO => UNIQUE
+                type: Sequelize.STRING(40),
+                allowNull: false,
             },
             leader:{
                 type: Sequelize.STRING(40),

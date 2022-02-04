@@ -3,8 +3,8 @@ module.exports= ((sequelize, DataTypes)=>{
     return sequelize.define(
         "user_study",
         {
-            id:{
-                type: Sequelize.INTEGER,
+            idx:{ // PK
+                type: Sequelize.BIGINT(11),
                 autoIncrement: true,
                 primaryKey: true,
             },

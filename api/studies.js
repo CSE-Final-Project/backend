@@ -91,21 +91,14 @@ router.get('/me', async (req, res, next) => {
     const my_study_ids = await models.user_study.findAll({
         attributes: ['study_id'],
         where: {
-            user_id: "aaaa@efgh.com"
+            user_id: "dddd@bbbb.com"
         }
     }).then(accounts => accounts.map(account => account.study_id));
 
     console.log(my_study_ids)
-
-    // find from the user_study
-    const my_studies = await models.user_study.findAll({
-        where: {
-            id: my_study_ids
-        }
-    })    
     
     // send back res
-    res.json(my_studies);
+    res.json(my_study_ids);
 })
 
 module.exports = router;
