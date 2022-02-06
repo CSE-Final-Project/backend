@@ -20,7 +20,7 @@ router.post('/', async (req, res, next) => {
         next(err);
     }
 })
-
+// 로그인
 router.post('/login', async (req, res, next) => {
     try{
         var id = req.body.id;
@@ -32,7 +32,7 @@ router.post('/login', async (req, res, next) => {
                 id: req.body.id
             }
         })
-        
+
         if (check_id.length != 0){
             // login id 존재
             const check_pw = ( check_id[0].password === password )
@@ -57,10 +57,9 @@ router.post('/login', async (req, res, next) => {
         next(err);
     }
 })
-
+// 로그아웃
 router.get('/logout', async (req, res, next) => {
     try{
-        req.logout();
         req.session.destroy();
         res.redirect('/api/users');
     } catch (err){

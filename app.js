@@ -24,6 +24,16 @@ app.use(session({
     saveUninitialized: true
   }))
 
+// app.get('/foo', function (req, res, next) {
+//     if (req.session.num === undefined) {
+//         req.session.num =1
+//     }else{
+//         req.session.num = req.session.num +1
+//     }
+//     res.send(`Views: ${req.session.num}`)
+// })
+
+
 // Other settings
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended: true}));
