@@ -2,13 +2,27 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const app = express();
 
+
 const models = require("./models/index.js");
 models.sequelize.sync().then( () => {
-    console.log(" DB 연결 성공");
+    console.log("DB conn");
 }).catch(err => {
-    console.log("연결 실패");
+    console.log("DB n conn");
     console.log(err);
 })
+
+const session = require('express-session')
+const FileStore = require('session-file-store')(session);
+ 
+var fileStoreOptions = {path: './sessions/'};
+
+// Session settings
+app.use(session({
+    store: new FileStore(fileStoreOptions),
+    secret: 'keyboard cat',
+    resave: false,
+    saveUninitialized: true
+  }))
 
 // Other settings
 app.use(bodyParser.json())
