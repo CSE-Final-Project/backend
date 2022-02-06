@@ -3,29 +3,43 @@ const router = express.Router()
 const models = require('../models/index')
 const { v4: uuidV4 } = require('uuid');
 
-// TODO ==> 향후 get은 필요없다
+// study 목록
 router.get('/', async (req, res, next) => {
-    const studies = await models.study.findAll({})
+    const studies = await models.study.findAll({
+        attributes: ['id', 'leader', 'title', 'target_time', 'penalty', 'info']
+    })
+    console.log(studies)
     res.json(studies);
 })
 
+// study 생성 
 router.post('/', async (req, res, next) => {
-    const new_study = await models.study.create({
-        leader: req.body.user, // TODO ==> user의 email 저장 (로그인 후 user의 email을 어떻게 가져오는가)
-        title: req.body.title,
-        topic: req.body.topic,
-        target_time: req.body.target_time,
-        addr: uuidV4(),
-        penalty: req.body.penalty,
-        info: req.body.info,
-    }).then(console.log())
+    // - login 안하면 접근 불가
+    if (req.session.user !== undefined){
 
-    const user_join_study = await models.user_study.create({
-        user_id: req.body.user,
-        study_id: new_study.id
-    })
+        const new_study = await models.study.create({
+            id: req.body.study_id,
+            leader: req.session.user.id, // (로그인 후 user의 id <- seesion)
+            title: req.body.title,
+            topic: req.body.topic,
+            target_time: req.body.target_time,
+            addr: uuidV4(),
+            penalty: req.body.penalty,
+            info: req.body.info,
+        }).then(console.log())
 
-    res.json(user_join_study);
+        await models.user_study.create({
+            user_id: req.session.user.id,
+            study_id: new_study.id
+        })
+
+        res.send('CREATE NEW STUDY')
+        //res.redirect('/api/studies/do/:studyId') study 생성 이후, redirect?
+    }
+    else{
+        res.send('LOGIN FIRST')
+    }
+    
 })
 
 router.post('/join', async (req, res, next) => {
