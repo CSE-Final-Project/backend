@@ -1,7 +1,8 @@
 # /api/studies/ [GET]
 - 전체 스터디 정보를 json으로 전달
 - res =>
-( id, leader, title, target_time, penalty, info )
+1) 성공
+( id, leader, title, topic, target_time, member_number, penalty, info )
 
 # /api/studies/ [POST]
 - 새로운 스터디 생성
@@ -31,7 +32,10 @@
 2) 실패 1: 이미 참여중인 스터디 {code="400", msg="already_joined"}
 3) 실패 2: 모집 마감 {code="400", msg="already_full"}
 
-# /api/studies/:userId [GET]
+# /api/studies/join [GET]
+- userId가 참여 중인 스터디 정보를 json으로 전달
 
-# /api/studies/do/:studyId [GET]
-
+- res =>
+1) 성공
+( id, leader, title, topic, target_time, member_number, penalty, info )
+2) 실패 1: 로그인 이전 {code="400", msg="login_first"}

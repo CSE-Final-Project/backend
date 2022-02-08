@@ -3,7 +3,7 @@ const router = express.Router()
 const models = require('../models/index')
 const { v4: uuidV4 } = require('uuid');
 
-// study 목록
+// 전체 study 조회
 router.get('/', async (req, res, next) => {
     const studies = await models.study.findAll({
         attributes: ['id', 'leader', 'title', 'target_time', 'penalty', 'info']
@@ -42,6 +42,7 @@ router.post('/', async (req, res, next) => {
     
 })
 
+// study 가입
 router.post('/join', async (req, res, next) => {
     // try-catch 안 쓰면 error
     try{
@@ -103,20 +104,35 @@ router.post('/join', async (req, res, next) => {
     }
 })
 
-router.get('/me', async (req, res, next) => {
-
-    // show the study list
-    const my_study_ids = await models.user_study.findAll({
-        attributes: ['study_id'],
-        where: {
-            user_id: "dddd@bbbb.com"
+// 참여 중인 study 조회
+router.get('/join', async (req, res, next) => {
+    try {
+        // - login 안하면 접근 불가
+        if (req.session.user !== undefined){
+            // 참여 중인 study id
+            const study_ids = await models.user_study.findAll({
+                attribute: ['study_id'],
+                where: {
+                    user_id: req.session.user.id,
+                }
+            }).then(accounts => accounts.map(account => account.study_id));
+            
+            // study
+            const studies = await models.study.findAll({
+                attributes: ['id', 'leader', 'title', 'target_time', 'penalty', 'info'],
+                where: {
+                    id: study_ids
+                }
+            })
+            res.json(studies);
         }
-    }).then(accounts => accounts.map(account => account.study_id));
-
-    console.log(my_study_ids)
-    
-    // send back res
-    res.json(my_study_ids);
+        else{
+            res.send({code:"400", msg:"login_first"})
+        }
+    } catch (err){
+        console.error(err);
+        next(err);
+    }
 })
 
 module.exports = router;
