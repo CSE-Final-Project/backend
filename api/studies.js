@@ -3,7 +3,7 @@ const router = express.Router()
 const models = require('../models/index')
 const { v4: uuidV4 } = require('uuid');
 
-// study 목록
+// 전체 study 조회
 router.get('/', async (req, res, next) => {
     const studies = await models.study.findAll({
         attributes: ['id', 'leader', 'title', 'target_time', 'penalty', 'info']
@@ -33,86 +33,110 @@ router.post('/', async (req, res, next) => {
             study_id: new_study.id
         })
 
-        res.send('CREATE NEW STUDY')
+        res.send({code:"200", msg:"create_success"})
         //res.redirect('/api/studies/do/:studyId') study 생성 이후, redirect?
     }
     else{
-        res.send('LOGIN FIRST')
+        res.send({code:"400", msg:"login_first"})
     }
     
 })
 
+// study 가입
 router.post('/join', async (req, res, next) => {
-
-    // check the study is on going recruiting
-    const is_recruit = await models.study.findAll({
-        attributes: ['is_recruit'],
-        where: {
-            id: req.body.study_id
-        }
-    })
-    
-    if (is_recruit[0].is_recruit == true){
-        // TODO => if I am already in study 
-
-        const already_in = await models.user_study.findAll({
-            attributes: ['study_id'],
+    // try-catch 안 쓰면 error
+    try{
+        // check the study is on going recruiting
+        const is_recruit = await models.study.findAll({
+            attribute: ['is_recruit'],
             where: {
-                user_id: req.body.user_id
+                id: req.body.study_id
             }
-        }).then(accounts => accounts.map(account => account.study_id));
+        })
+        
+        if (is_recruit[0].is_recruit == true){
+            // TODO => if I am already in study 
 
-        console.log(already_in)
+            const already_in = await models.user_study.findAll({
+                attribute: ['study_id'],
+                where: {
+                    user_id: req.session.user.id,
+                }
+            }).then(accounts => accounts.map(account => account.study_id));
 
-        if (already_in.includes(String(req.body.study_id))){
-            res.send({message: 'YOU ARE ALREADY IN STUDY'});
+            if (already_in.includes(String(req.body.study_id))){
+                res.send({code:"400", msg:"already_joined"});
+            }
+            else{
+                // join me!
+                const new_join = await models.user_study.create({
+                    user_id: req.session.user.id,
+                    study_id: req.body.study_id
+                })
+
+                // update study_member
+                const update = await models.study.increment(
+                    {member_number: 1},{ where: { id: req.body.study_id } });
+                
+                // if study_member is full then set is_recruit false!
+                const check = await models.study.findAll({
+                    attributes: ['member_number'],
+                    where: {
+                        id: req.body.study_id
+                    }
+                })
+                if (check[0].member_number >= 4){
+                    await models.study.update(
+                        { is_recruit: false },
+                        { where: { id: req.body.study_id} }
+                    )
+                }
+                res.json({code:"200", msg:"join_success"});
+            }
         }
         else{
-            // join me!
-            const new_join = await models.user_study.create({
-                user_id: req.body.user_id,
-                study_id: req.body.study_id
-            })
-
-            // update study_member
-            const update = await models.study.increment(
-                {member_number: 1},{ where: { id: req.body.study_id } });
-
-            // if study_member is full then set is_recruit false!
-            const check = await models.study.findAll({
-                attributes: ['member_number'],
-                where: {
-                    id: req.body.study_id
-                }
-            })
-            if (check[0].member_number >= 4){
-                await models.study.update(
-                    { is_recruit: false },
-                    { where: { id: req.body.study_id} }
-                )
-            }
-            res.json(new_join);
+            res.send({code:"400", msg:"already_full"});
         }
-    }
-    else{
-        res.send({message: 'STUDY IS ALREADY FULL'});
+    } catch (err){
+        console.error(err);
+        next(err);
     }
 })
 
-router.get('/me', async (req, res, next) => {
-
-    // show the study list
-    const my_study_ids = await models.user_study.findAll({
-        attributes: ['study_id'],
-        where: {
-            user_id: "dddd@bbbb.com"
+// study 시작
+router.get('/do/:studyId', async (req,res,next) => {
+    try {
+        // Check login
+        if (req.session.user !== undefined){
+             // Check (userId, studyId) in user_study table
+             const check = await models.user_study.findOne({ 
+                where: {
+                    user_id: req.session.user.id,
+                    study_id: req.params.studyId
+                } 
+            }) 
+            
+            if (check !== null){
+                // if there is, find study_addr in study table
+                const study = await models.study.findOne({
+                    where:{
+                        id: req.params.studyId
+                  }
+                })
+                // redirect user to there
+                res.send({code:"200", msg:"redirect_to_studyroom", addr:study.addr})
+            }
+            else{
+                res.send({code:"400", msg:"access_denied"})
+            }            
         }
-    }).then(accounts => accounts.map(account => account.study_id));
-
-    console.log(my_study_ids)
-    
-    // send back res
-    res.json(my_study_ids);
+        else{
+            res.send({code:"400", msg:"login_first"})
+        }
+    } catch(err) {
+        console.error(err);
+        next(err);
+    }
 })
 
 module.exports = router;

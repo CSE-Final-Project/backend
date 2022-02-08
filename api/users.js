@@ -67,4 +67,36 @@ router.get('/logout', async (req, res, next) => {
         next(err);
     }
 })
+
+// 참여 중인 study 조회
+router.get('/studies', async (req, res, next) => {
+    try {
+        // - login 안하면 접근 불가
+        if (req.session.user !== undefined){
+            // 참여 중인 study id
+            const study_ids = await models.user_study.findAll({
+                attribute: ['study_id'],
+                where: {
+                    user_id: req.session.user.id,
+                }
+            }).then(accounts => accounts.map(account => account.study_id));
+            
+            // study
+            const studies = await models.study.findAll({
+                attributes: ['id', 'leader', 'title', 'target_time', 'penalty', 'info'],
+                where: {
+                    id: study_ids
+                }
+            })
+            res.json(studies);
+        }
+        else{
+            res.send({code:"400", msg:"login_first"})
+        }
+    } catch (err){
+        console.error(err);
+        next(err);
+    }
+})
+
 module.exports = router;
