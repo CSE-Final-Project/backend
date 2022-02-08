@@ -139,4 +139,31 @@ router.get('/do/:studyId', async (req,res,next) => {
     }
 })
 
+// study mate 조회
+router.get('/mates/:studyId', async (req, res, next) => {
+    try {
+        // find user_id where study_id is studyID in user_study table
+        
+        const mates = await models.user_study.findAll({
+            attribute: ['user_id'],
+            where: {
+                study_id: req.params.studyId
+            }
+        }).then(accounts => accounts.map(account => account.user_id));
+        
+        if (mates.length == 0){
+            // error1 - nonexistent study ID
+            res.send({code:"400", msg:"nonexistent_study"}) 
+        }
+        else{
+            // result: success
+            res.send(mates)
+        }
+    }catch(err){
+        console.error(err);
+        next(err);
+    }
+
+})
+
 module.exports = router;

@@ -42,10 +42,20 @@
 
 2) 실패 1: 로그인 필요 {code:"400", msg:"login_first"}
 3) 실패 2: 접근 제한 {code:"400", msg:"access_denied"}
+`4) 실패 3: 존재하지 않는 studyId` 
 
 # /api/studies/do/:studyId [POST]
+- Flask server
 
 # /api/studies/mates/:studyId [GET]
+- studyId의 참여 중인 user 정보를 json으로 전달
+
+- res =>
+1) 성공
+( user_id )
+
+2) 실패 1: 존재하지 않는 studyId {code:"400", msg:"nonexistent_study"}
+`3) 실패 2: 접근 제한 {code:"400", msg:"access_denied"}`
 
 # /api/studeis/attendance/:studyId [POST]
 
