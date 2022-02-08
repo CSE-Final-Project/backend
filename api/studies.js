@@ -46,7 +46,6 @@ router.post('/', async (req, res, next) => {
 router.post('/join', async (req, res, next) => {
     // try-catch 안 쓰면 error
     try{
-        console.log(req.body.study_id)
         // check the study is on going recruiting
         const is_recruit = await models.study.findAll({
             attribute: ['is_recruit'],
@@ -104,32 +103,37 @@ router.post('/join', async (req, res, next) => {
     }
 })
 
-// 참여 중인 study 조회
-router.get('/join', async (req, res, next) => {
+// study 시작
+router.get('/do/:studyId', async (req,res,next) => {
     try {
-        // - login 안하면 접근 불가
+        // Check login
         if (req.session.user !== undefined){
-            // 참여 중인 study id
-            const study_ids = await models.user_study.findAll({
-                attribute: ['study_id'],
+             // Check (userId, studyId) in user_study table
+             const check = await models.user_study.findOne({ 
                 where: {
                     user_id: req.session.user.id,
-                }
-            }).then(accounts => accounts.map(account => account.study_id));
+                    study_id: req.params.studyId
+                } 
+            }) 
             
-            // study
-            const studies = await models.study.findAll({
-                attributes: ['id', 'leader', 'title', 'target_time', 'penalty', 'info'],
-                where: {
-                    id: study_ids
-                }
-            })
-            res.json(studies);
+            if (check !== null){
+                // if there is, find study_addr in study table
+                const study = await models.study.findOne({
+                    where:{
+                        id: req.params.studyId
+                  }
+                })
+                // redirect user to there
+                res.send({code:"200", msg:"redirect_to_studyroom", addr:study.addr})
+            }
+            else{
+                res.send({code:"400", msg:"access_denied"})
+            }            
         }
         else{
             res.send({code:"400", msg:"login_first"})
         }
-    } catch (err){
+    } catch(err) {
         console.error(err);
         next(err);
     }
