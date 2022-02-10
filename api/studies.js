@@ -2,6 +2,8 @@ const express = require('express')
 const router = express.Router()
 const models = require('../models/index')
 const { v4: uuidV4 } = require('uuid');
+const Sequelize = require('sequelize');
+const Op = Sequelize.Op;
 
 // 전체 study 조회
 router.get('/', async (req, res, next) => {
@@ -164,6 +166,55 @@ router.get('/mates/:studyId', async (req, res, next) => {
         next(err);
     }
 
+})
+
+// study 출석 확인
+router.post('/attendance/:studyId', async (req, res, next) => {
+    try {
+        // ( day, userID, attendance ) <- ( studyId (addr), week (body) )
+        // from attendance DB
+        const date = new Date(req.body.date);
+
+        const sevenDaysAgo = new Date(new Date().setDate(date.getDate() - 7));        
+
+        const atd = await models.attendance.findAll({
+            attributes: ['user_id', 'date', 'attendance'],
+            where: {
+                study_id: req.params.studyId,
+                date: {
+                    [Op.gt]: sevenDaysAgo,
+                    [Op.lte]: date 
+                } 
+            },
+            order: ['date','user_id' ]
+        })
+
+        res.send(atd)
+        
+    } catch(err){
+        console.error(err);
+        next(err);
+    }
+})
+
+// study 벌금 확인
+router.get('/penalty/:studyId', async (req, res, next)=> {
+    try {
+        // studyId 로 penalty DB에서 ( user_id, penalty ) 가져오기
+        const penalties = await models.penalty.findAll({
+            attributes: ['user_id','total_penalty'],
+            where: {
+                study_id: req.params.studyId,
+            },
+            order: ['user_id' ]
+        })
+
+        res.send(penalties)
+
+    } catch(err){
+        console.error(err);
+        next(err);
+    }
 })
 
 module.exports = router;

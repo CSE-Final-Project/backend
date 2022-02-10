@@ -16,6 +16,10 @@ module.exports= ((sequelize, DataTypes)=>{
                 type: Sequelize.STRING(40),
                 allowNull: false,
             },
+            date:{
+                type: Sequelize.DATEONLY,
+                allowNull: false
+            },
             attendance:{
                 type: Sequelize.BOOLEAN,
                 allowNull: false,

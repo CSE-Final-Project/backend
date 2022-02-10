@@ -58,9 +58,22 @@
 `3) 실패 2: 접근 제한 {code:"400", msg:"access_denied"}`
 
 # /api/studeis/attendance/:studyId [POST]
+- studyId의 주어진 날짜에서 1주일 간 출석 정보를 json으로 전달
+
+- req.body => 
+{
+    "date":"2022-02-10", [Date]
+}
+- res =>
+1) 성공
+( user_id, date, attendance ) //날짜순
 
 # /api/studeis/penalty/:studyId [GET]
+- studyId의 벌금 상황을 json으로 전달
 
+- res =>
+1) 성공
+( user_id, penalty ) //이름순
 
 # Questions
 Q. 원래 API 마다 전부 로그인 확인, 접근 제한 등의 검사를 다 작성하나요?
