@@ -14,7 +14,7 @@ router.post('/', async (req, res, next) => {
             id: req.body.id,
             password: req.body.password,
         })
-        res.json({success:true, data:new_user});
+        res.json({code="200", msg="create_success"});
     } catch (err){
         console.error(err);
         next(err);
@@ -42,15 +42,16 @@ router.post('/login', async (req, res, next) => {
                     id: id,
                     is_logined: true
                 }
-                res.send('LOGIN') // success code 200, 201
+                res.send({code="200", msg="login"})
             }
             else {
                 // login 실패 - id와 pw가 일치하지 않습니다
-                res.send('id-pw 불일치') // fail code 400, 401
+                res.send({code="400", msg="mismatch"})
             }
         }
         else{
-            res.send('존재하지 않는 id')
+            // login 실패 - 존재하지 않는 id
+            res.send({code="400", msg="nonexsist_id"})
         }
     } catch (err){
         console.error(err);
