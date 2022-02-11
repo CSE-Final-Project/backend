@@ -1,8 +1,19 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-const app = express();
+const cors = require('cors')
+const express = require('express')
+const bodyParser = require('body-parser')
+const app = express()
+const fs = require('fs') //
 
+// Https
+const https = require('https') //
+const server = https.createServer({
+    key: fs.readFileSync('./private.pem'),
+    cert: fs.readFileSync('./public.pem'),
+    requestCert: false,
+    rejectUnauthorized: false
+}, app)
 
+// DB
 const models = require("./models/index.js");
 models.sequelize.sync().then( () => {
     console.log("DB conn");
@@ -11,28 +22,16 @@ models.sequelize.sync().then( () => {
     console.log(err);
 })
 
+// Session
 const session = require('express-session')
-const FileStore = require('session-file-store')(session);
- 
+const FileStore = require('session-file-store')(session); 
 var fileStoreOptions = {path: './sessions/'};
-
-// Session settings
 app.use(session({
     store: new FileStore(fileStoreOptions),
     secret: 'keyboard cat',
     resave: false,
     saveUninitialized: true
   }))
-
-// app.get('/foo', function (req, res, next) {
-//     if (req.session.num === undefined) {
-//         req.session.num =1
-//     }else{
-//         req.session.num = req.session.num +1
-//     }
-//     res.send(`Views: ${req.session.num}`)
-// })
-
 
 // Other settings
 app.use(bodyParser.json())
@@ -48,6 +47,20 @@ app.use(function(req, res, next){
 app.use('/api/users', require('./api/users'));
 app.use('/api/studies', require('./api/studies'));
 
+// Socket IO
+const io = require('socket.io')(server, {
+    cors: {
+        origin: "https://10.200.148.175:3000", //
+        methods: ["GET","POST"]
+    }
+})
+require("./socket.js")(io);
+
+app.use(cors({
+    origin: 'https://10.200.148.175:3000', //
+    credentials: true
+}))
+
 // Port setting
-var port = 3000;
-app.listen(3000)
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+server.listen(process.env.PORT || 8000, () => console.log('server port 8000'));
