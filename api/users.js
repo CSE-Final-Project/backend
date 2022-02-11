@@ -14,7 +14,7 @@ router.post('/', async (req, res, next) => {
             id: req.body.id,
             password: req.body.password,
         })
-        res.json({code="200", msg="create_success"});
+        res.send({code:"200", msg:"create_success"});
     } catch (err){
         console.error(err);
         next(err);
@@ -33,6 +33,8 @@ router.post('/login', async (req, res, next) => {
             }
         })
 
+        console.log('login', id, password)
+
         if (check_id.length != 0){
             // login id 존재
             const check_pw = ( check_id[0].password === password )
@@ -42,16 +44,16 @@ router.post('/login', async (req, res, next) => {
                     id: id,
                     is_logined: true
                 }
-                res.send({code="200", msg="login"})
+                res.send({code:"200", msg:"login", id:id})
             }
             else {
                 // login 실패 - id와 pw가 일치하지 않습니다
-                res.send({code="400", msg="mismatch"})
+                res.send({code:"400", msg:"mismatch"})
             }
         }
         else{
             // login 실패 - 존재하지 않는 id
-            res.send({code="400", msg="nonexsist_id"})
+            res.send({code:"400", msg:"nonexsist_id"})
         }
     } catch (err){
         console.error(err);
@@ -61,6 +63,7 @@ router.post('/login', async (req, res, next) => {
 // 로그아웃
 router.get('/logout', async (req, res, next) => {
     try{
+        console.log('logout', req.session.id)
         req.session.destroy();
         res.redirect('/api/users');
     } catch (err){
@@ -71,6 +74,8 @@ router.get('/logout', async (req, res, next) => {
 
 // 참여 중인 study 조회
 router.get('/studies', async (req, res, next) => {
+
+    console.log('get /users/studies')
     try {
         // - login 안하면 접근 불가
         if (req.session.user !== undefined){

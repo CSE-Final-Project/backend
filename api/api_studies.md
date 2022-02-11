@@ -75,6 +75,8 @@
 1) 성공
 ( user_id, penalty ) //이름순
 
+## /api/studies/time/:studyId [POST]
+
 
 ## Questions
 Q. 원래 API 마다 전부 로그인 확인, 접근 제한 등의 검사를 다 작성하나요?
