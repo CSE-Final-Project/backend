@@ -7,6 +7,11 @@
     "id"="", [string]
     "password"="", [string]
 }
+- (ex)
+{
+    "id":"aaaa",
+    "password":"1234"
+}
 
 - res =>
 1) 성공 {code="200", msg="create_success"}
@@ -18,6 +23,11 @@
 {
     "id"="", [string]
     "password"="", [string]
+}
+- (ex)
+{
+    "id":"aaaa",
+    "password":"1234"
 }
 
 1) 성공 {code="200", msg="login"}

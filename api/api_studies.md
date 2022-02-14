@@ -15,6 +15,15 @@
     "penalty"="", [int]
     "info"="", [string]
 }
+- (ex)
+{
+    "study_id":"study2",
+    "title":"CodingTest2",
+    "topic":"CS",
+    "target_time":3,
+    "penalty":5000,
+    "info":"This study is of studying algorithm test2"
+}
 
 - res =>
 1) 성공 {code="200", msg="create_success"}
@@ -25,6 +34,10 @@
 - req.body => 
 {
     "study_id"="", [string]
+}
+- (ex)
+{
+    "study_id":"study1"
 }
 
 - res =>
@@ -62,8 +75,13 @@
 
 - req.body => 
 {
-    "date":"2022-02-10", [Date]
+    "date"[Date]
 }
+- (ex)
+{
+    "date":"2022-02-10"
+}
+
 - res =>
 1) 성공
 ( user_id, date, attendance ) //날짜순
@@ -75,8 +93,18 @@
 1) 성공
 ( user_id, penalty ) //이름순
 
-## /api/studies/time/:studyId [POST]
+## /api/studies/time/:studyId [PUT]
+- studyId의 공부 시간 update
 
+- req.body =>
+{
+    study_time: [TIME]
+}
+
+- (ex)
+{
+    "study_time":"00:59:59"
+}
 
 ## Questions
 Q. 원래 API 마다 전부 로그인 확인, 접근 제한 등의 검사를 다 작성하나요?
