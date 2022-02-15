@@ -218,27 +218,31 @@ router.get('/penalty/:studyId', async (req, res, next)=> {
     }
 })
 
-// study 공부 시간 update
+// study 공부 시간 UPDATE
 router.post('/time/:studyId', async (req, res, next) => {
     try {
         let today = new Date();
         today.setUTCHours(0, 0, 0, 0);
 
+        // today studytime ( userId, studyId )
         const today_study = await models.studytime.findOne({
             where: { study_id: req.params.studyId, user_id: req.session.user.id, date: { [Op.eq]: today } }
         })
 
+        // add
         let update_time = today_study.studytime + req.body.study_time
 
+        // update DB
         const result = await models.studytime.update(
             { studytime: update_time },
             { where : { idx: today_study.idx} }
         )
         
-        res.send({code="200", "study_time": update_time})
-        console.log(update_time)
+        // SUCCESS
+        res.send({code="200"})
 
     } catch(err){
+        res.send({code="400"})
         console.error(err);
         next(err);
     }

@@ -109,7 +109,7 @@
 
 - res =>
 1) 성공
-{code="200", "study_time": update_time}
+{code="200"}
 
 ## /api/studies/time/:studyId [GET]
 
