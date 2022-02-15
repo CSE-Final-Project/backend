@@ -2,7 +2,8 @@
 - 전체 스터디 정보를 json으로 전달
 - res =>
 1) 성공
-( id, leader, title, topic, target_time, member_number, penalty, info )
+( id, leader, title, topic, target_time, member_number, penalty,
+, info )
 
 ## /api/studies/ [POST]
 - 새로운 스터디 생성
@@ -93,7 +94,7 @@
 1) 성공
 ( user_id, penalty ) //이름순
 
-## /api/studies/time/:studyId [PUT]
+## /api/studies/time/:studyId [POST]
 - studyId의 공부 시간 update
 
 - req.body =>
@@ -105,6 +106,9 @@
 {
     "study_time":"00:59:59"
 }
+
+## /api/studies/time/:studyId [GET]
+
 
 ## Questions
 Q. 원래 API 마다 전부 로그인 확인, 접근 제한 등의 검사를 다 작성하나요?

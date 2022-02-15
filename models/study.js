@@ -25,7 +25,7 @@ module.exports = ((sequelize, DataTypes)=>{
                 allowNull: false,
             },
             target_time: {
-                type: Sequelize.INTEGER,
+                type: Sequelize.TIME,
                 allowNull: false,
             },
             addr: {
@@ -39,6 +39,10 @@ module.exports = ((sequelize, DataTypes)=>{
             penalty: {
                 type: Sequelize.INTEGER,
                 allowNull: false,
+            },
+            date_start: {
+                type: Sequelize.DATE,
+                allowNull: true,
             },
             is_recruit: {
                 type: Sequelize.BOOLEAN,

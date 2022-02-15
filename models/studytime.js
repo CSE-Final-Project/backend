@@ -20,6 +20,10 @@ module.exports= ((sequelize, DataTypes)=>{
                 type: Sequelize.TIME,
                 allowNull: false,
             },
+            date:{
+                type: Sequelize.DATE,
+                allowNull: false
+            }
         },
         {
             timestamps: true,

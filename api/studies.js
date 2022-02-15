@@ -3,6 +3,8 @@ const router = express.Router()
 const models = require('../models/index')
 const { v4: uuidV4 } = require('uuid');
 const Sequelize = require('sequelize');
+const { route } = require('./users');
+const { sequelize } = require('../models/index');
 const Op = Sequelize.Op;
 
 // 전체 study 조회
@@ -41,7 +43,6 @@ router.post('/', async (req, res, next) => {
     else{
         res.send({code:"400", msg:"login_first"})
     }
-    
 })
 
 // study 가입
@@ -210,6 +211,33 @@ router.get('/penalty/:studyId', async (req, res, next)=> {
         })
 
         res.send(penalties)
+
+    } catch(err){
+        console.error(err);
+        next(err);
+    }
+})
+
+// study 공부 시간 update
+router.post('/time/:studyId', async (req, res, next) => {
+    try {
+        let today = new Date();
+        today.setUTCHours(0, 0, 0, 0);
+
+        const today_study = await models.studytime.findOne({
+            where: { study_id: req.params.studyId, user_id: req.session.user.id, date: { [Op.eq]: today } }
+        })
+
+
+        let update_time = new Date(new Date(today_study.studytime) + new Date(req.body.study_time))
+
+        const result = await models.studytime.update(
+            { studytime: update_time },
+            { where : { idx: today_study.idx} }
+        )
+        
+        res.send({"study_time": update_time})
+        console.log(update_time)
 
     } catch(err){
         console.error(err);
