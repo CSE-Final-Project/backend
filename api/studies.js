@@ -239,10 +239,10 @@ router.post('/time/:studyId', async (req, res, next) => {
         )
         
         // SUCCESS
-        res.send({code="200"})
+        res.send({code:"200"})
 
     } catch(err){
-        res.send({code="400"})
+        res.send({code:"400"})
         console.error(err);
         next(err);
     }
