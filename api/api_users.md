@@ -44,5 +44,5 @@
 
 - res =>
 1) 성공
-( id, leader, title, topic, target_time, member_number, penalty, info )
+( id, leader, title, topic, target_time, member_number, penalty, date_start, info )
 2) 실패 1: 로그인 이전 {code="400", msg="login_first"}

@@ -40,6 +40,10 @@ module.exports = ((sequelize, DataTypes)=>{
                 type: Sequelize.INTEGER,
                 allowNull: false,
             },
+            date_start: {
+                type: Sequelize.DATE,
+                allowNull: true,
+            },
             is_recruit: {
                 type: Sequelize.BOOLEAN,
                 defaultValue: true,

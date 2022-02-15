@@ -32,4 +32,17 @@ Object.keys(db).forEach(modelName => {
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 
+// db.User = require('./user')(sequelize, Sequelize);
+// db.Study = require('./study')(sequelize, Sequelize);
+// db.StudyTime = require('./studytime')(sequelize, Sequelize);
+
+// /* user -> studytime: 1->N */
+// db.User.hasMany(db.StudyTime, { foreignKey: 'user_id', sourceKey: 'id'});
+// /* studytime -> user: N->1 */
+// db.StudyTime.belongsTo(db.User, { foriegnKey: 'user_id', targetKey: 'id'});
+// /* study -> studytime: 1->N */
+// db.Study.hasMany(db.StudyTime, { foriegnKey: 'study_id', sourceKey: 'id'})
+// /* studytime -> study: N->1 */
+// db.StudyTime.belongsTo(db.Study, { foriegnKey: 'study_id', targetKey: 'id'})
+
 module.exports = db;

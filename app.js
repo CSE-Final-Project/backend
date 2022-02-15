@@ -46,6 +46,7 @@ app.use(function(req, res, next){
 // API
 app.use('/api/users', require('./api/users'));
 app.use('/api/studies', require('./api/studies'));
+app.use('/api/check', require('./api/check'));
 
 // Socket IO
 const io = require('socket.io')(server, {
@@ -64,3 +65,4 @@ app.use(cors({
 // Port setting
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 server.listen(process.env.PORT || 8000, () => console.log('server port 8000'));
+
