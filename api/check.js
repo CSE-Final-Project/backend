@@ -15,15 +15,15 @@ router.get('/', async (req, res, next) => {
 
     let query =
      `SELECT * FROM studytimes
-            JOIN studies
-            ON studytimes.study_id = studies.id`
+            JOIN studies ON studytimes.study_id = studies.id
+            WHERE studies.target_time <= studytimes.studytime`
             
     const studytime = await models.sequelize.query(
         query,
         { type: QueryTypes.SELECT,
         raw: true
         }
-    )
+    ).then(accounts => accounts.map(account => [account.target_time, account.studytime ]));
     res.send(studytime)
     console.log(studytime)
 })

@@ -99,13 +99,17 @@
 
 - req.body =>
 {
-    study_time: [TIME]
+    study_time: [INT]
 }
 
 - (ex)
 {
-    "study_time":"00:59:59"
+    "study_time":3600 /*초단위(정수형)*/
 }
+
+- res =>
+1) 성공
+{code="200", "study_time": update_time}
 
 ## /api/studies/time/:studyId [GET]
 

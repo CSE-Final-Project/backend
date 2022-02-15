@@ -17,7 +17,7 @@ module.exports= ((sequelize, DataTypes)=>{
                 allowNull: false,
             },
             studytime:{
-                type: Sequelize.TIME,
+                type: Sequelize.INTEGER,
                 allowNull: false,
             },
             date:{

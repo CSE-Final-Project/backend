@@ -25,7 +25,7 @@ module.exports = ((sequelize, DataTypes)=>{
                 allowNull: false,
             },
             target_time: {
-                type: Sequelize.TIME,
+                type: Sequelize.INTEGER,
                 allowNull: false,
             },
             addr: {

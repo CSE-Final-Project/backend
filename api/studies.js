@@ -228,15 +228,14 @@ router.post('/time/:studyId', async (req, res, next) => {
             where: { study_id: req.params.studyId, user_id: req.session.user.id, date: { [Op.eq]: today } }
         })
 
-
-        let update_time = new Date(new Date(today_study.studytime) + new Date(req.body.study_time))
+        let update_time = today_study.studytime + req.body.study_time
 
         const result = await models.studytime.update(
             { studytime: update_time },
             { where : { idx: today_study.idx} }
         )
         
-        res.send({"study_time": update_time})
+        res.send({code="200", "study_time": update_time})
         console.log(update_time)
 
     } catch(err){

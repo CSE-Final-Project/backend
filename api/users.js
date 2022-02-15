@@ -89,7 +89,7 @@ router.get('/studies', async (req, res, next) => {
             
             // study
             const studies = await models.study.findAll({
-                attributes: ['id', 'leader', 'title', 'target_time', 'penalty', 'info'],
+                attributes: ['id', 'leader', 'title', 'target_time', 'penalty', 'date_start', 'info'],
                 where: {
                     id: study_ids
                 }
