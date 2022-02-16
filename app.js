@@ -46,7 +46,6 @@ app.use(function(req, res, next){
 // API
 app.use('/api/users', require('./api/users'));
 app.use('/api/studies', require('./api/studies'));
-app.use('/api/check', require('./api/check'));
 
 // Socket IO
 const io = require('socket.io')(server, {
@@ -61,6 +60,44 @@ app.use(cors({
     origin: 'https://10.200.148.175:3000', //
     credentials: true
 }))
+
+const schedule = require('node-schedule');
+const { QueryTypes } = require('sequelize');
+
+// Attendance Check
+const attendance_check_time = '59 23 * * *'
+const attendance_check = schedule.scheduleJob(attendance_check_time, async () => {
+    let query =
+    `SELECT user_id, study_id, target_time, date, studytime FROM studytimes
+            JOIN studies ON studytimes.study_id = studies.id
+            WHERE Date(studytimes.date) = CURDATE()`
+        
+    const studytime = await models.sequelize.query(
+        query,
+        {   type: QueryTypes.SELECT   }
+    )
+
+    for (i of studytime){
+        if ( i.target_time > i.studytime ){
+            // Attendance
+            await models.attendance.create({
+                user_id: i.user_id,
+                study_id: i.study_id,
+                date: i.date,
+                attendance: 0
+            })
+        }
+        else {
+            // Absent
+            await models.attendance.create({
+                user_id: i.user_id,
+                study_id: i.study_id,
+                date: i.date,
+                attendance: 1
+            })
+        }
+    }
+})
 
 // Port setting
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
