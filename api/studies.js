@@ -126,6 +126,28 @@ router.get('/do/:studyId', async (req,res,next) => {
                         id: req.params.studyId
                   }
                 })
+                
+                const today = new Date()
+                today.setUTCHours(0, 0, 0, 0)
+
+                const check2 = await models.studytime.findOne({ 
+                    where: {
+                        user_id: req.session.user.id,
+                        study_id: req.params.studyId,
+                        date: today,
+                    }
+                })
+
+                if (check2 == null){
+                    // set studytime to 0
+                    await models.studytime.create({
+                        user_id: req.session.user.id,
+                        study_id: req.params.studyId,
+                        studytime: 0,
+                        date: today,
+                    })
+                }
+                
                 // redirect user to there
                 res.send({code:"200", msg:"redirect_to_studyroom", addr:study.addr})
             }
@@ -218,27 +240,37 @@ router.get('/penalty/:studyId', async (req, res, next)=> {
     }
 })
 
-// study 공부 시간 update
-router.post('/time/:studyId', async (req, res, next) => {
+// study 공부 시간 UPDATE
+router.post('/time/:addr', async (req, res, next) => {
     try {
+        // find studyId from addr
+        const studyId = await models.study.findOne({
+            where: {addr:req.params.addr}
+        })
+
+        // find today
         let today = new Date();
         today.setUTCHours(0, 0, 0, 0);
 
+        // find studytime ( userId, studyId, today )
         const today_study = await models.studytime.findOne({
-            where: { study_id: req.params.studyId, user_id: req.session.user.id, date: { [Op.eq]: today } }
+            where: { study_id: studyId.id , user_id: req.session.user.id, date: { [Op.eq]: today } }
         })
-
+        
+        // add
         let update_time = today_study.studytime + req.body.study_time
 
+        // update studytime
         const result = await models.studytime.update(
             { studytime: update_time },
             { where : { idx: today_study.idx} }
         )
         
-        res.send({code="200", "study_time": update_time})
-        console.log(update_time)
+        // SUCCESS
+        res.send({code:"200"})
 
     } catch(err){
+        res.send({code:"400"})
         console.error(err);
         next(err);
     }
