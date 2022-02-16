@@ -127,26 +127,27 @@ router.get('/do/:studyId', async (req,res,next) => {
                   }
                 })
                 
-                const today = new Date()
-                today.setUTCHours(0, 0, 0, 0)
+                // app.js -> Studytime Initialize
+                // const today = new Date()
+                // today.setUTCHours(0, 0, 0, 0)
 
-                const check2 = await models.studytime.findOne({ 
-                    where: {
-                        user_id: req.session.user.id,
-                        study_id: req.params.studyId,
-                        date: today,
-                    }
-                })
+                // const check2 = await models.studytime.findOne({ 
+                //     where: {
+                //         user_id: req.session.user.id,
+                //         study_id: req.params.studyId,
+                //         date: today,
+                //     }
+                // })
 
-                if (check2 == null){
-                    // set studytime to 0
-                    await models.studytime.create({
-                        user_id: req.session.user.id,
-                        study_id: req.params.studyId,
-                        studytime: 0,
-                        date: today,
-                    })
-                }
+                // if (check2 == null){
+                //     // set studytime to 0
+                //     await models.studytime.create({
+                //         user_id: req.session.user.id,
+                //         study_id: req.params.studyId,
+                //         studytime: 0,
+                //         date: today,
+                //     })
+                // }
                 
                 // redirect user to there
                 res.send({code:"200", msg:"redirect_to_studyroom", addr:study.addr})
@@ -276,4 +277,32 @@ router.post('/time/:addr', async (req, res, next) => {
     }
 })
 
+router.get('/completed/:studyId', async (req, res, next) => {
+    try {
+        // fineOne by studyId from study
+        const completed = await models.study.update(
+            {
+                is_recruit: 0,
+                date_start: new Date()
+            },
+            { where: { id: req.params.studyId } })
+        // penalty create ( user_id, study_id, penalty = 0 )
+        const users = await models.user_study.findAll({
+            attribute: ['user_id'],
+            where: { study_id: req.params.studyId }
+        })
+        for (u of users){
+            await models.penalty.create({
+                user_id: u.user_id,
+                study_id: req.params.studyId,
+                total_penalty: 0
+            })
+        }
+        res.send({code:"200"})
+    } catch(err){
+        res.send({code:"400"})
+        console.log(err)
+        next(err)
+    }
+})
 module.exports = router;
