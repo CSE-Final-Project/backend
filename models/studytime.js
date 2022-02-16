@@ -21,7 +21,7 @@ module.exports= ((sequelize, DataTypes)=>{
                 allowNull: false,
             },
             date:{
-                type: Sequelize.DATE,
+                type: Sequelize.DATE, //DATEONLY
                 allowNull: false
             }
         },
