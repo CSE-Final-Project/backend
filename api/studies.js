@@ -277,6 +277,7 @@ router.post('/time/:addr', async (req, res, next) => {
     }
 })
 
+// study 모집 완료
 router.get('/completed/:studyId', async (req, res, next) => {
     try {
         // fineOne by studyId from study
