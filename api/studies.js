@@ -45,21 +45,6 @@ router.post('/', async (req, res, next) => {
     }
 })
 
-// study 삭제
-router.delete('/setting/:studyId', async (req, res, next) => {
-    try{
-        // delete study 
-        const study = await models.study.destroy({
-            where: { id: req.params.studyId }
-        })
-        res.send({"code":200})
-    }catch(err){
-        res.send({"code":400})
-        console.log(err)
-        next(err)
-    }
-})
-
 // study 가입
 router.post('/join', async (req, res, next) => {
     // try-catch 안 쓰면 error
@@ -256,8 +241,53 @@ router.get('/penalty/:studyId', async (req, res, next)=> {
     }
 })
 
+// study 모집 완료
+router.get('/completed/:studyId', async (req, res, next) => {
+    try {
+        // fineOne by studyId from study
+        const completed = await models.study.update(
+            {
+                is_recruit: 0,
+                date_start: new Date()
+            },
+            { where: { id: req.params.studyId } })
+        // penalty create ( user_id, study_id, penalty = 0 )
+        const users = await models.user_study.findAll({
+            attribute: ['user_id'],
+            where: { study_id: req.params.studyId }
+        })
+        for (u of users){
+            await models.penalty.create({
+                user_id: u.user_id,
+                study_id: req.params.studyId,
+                total_penalty: 0
+            })
+        }
+        res.send({code:"200"})
+    } catch(err){
+        res.send({code:"400"})
+        console.log(err)
+        next(err)
+    }
+})
+
+// study 삭제
+router.delete('/setting/:studyId', async (req, res, next) => {
+    try{
+        // delete study 
+        const study = await models.study.destroy({
+            where: { id: req.params.studyId }
+        })
+        res.send({"code":200})
+    }catch(err){
+        res.send({"code":400})
+        console.log(err)
+        next(err)
+    }
+})
+
 // study 공부 시간 UPDATE
-router.post('/time/:addr', async (req, res, next) => {
+router.patch('/time/:addr', async (req, res, next) => {
     try {
         // find studyId from addr
         const studyId = await models.study.findOne({
@@ -292,33 +322,29 @@ router.post('/time/:addr', async (req, res, next) => {
     }
 })
 
-// study 모집 완료
-router.get('/completed/:studyId', async (req, res, next) => {
-    try {
-        // fineOne by studyId from study
-        const completed = await models.study.update(
-            {
-                is_recruit: 0,
-                date_start: new Date()
-            },
-            { where: { id: req.params.studyId } })
-        // penalty create ( user_id, study_id, penalty = 0 )
-        const users = await models.user_study.findAll({
-            attribute: ['user_id'],
-            where: { study_id: req.params.studyId }
-        })
-        for (u of users){
-            await models.penalty.create({
-                user_id: u.user_id,
+// study 공부 시간 확인
+router.post('/time/:studyId', async (req, res, next) => {    
+    try{
+        const date = new Date(req.body.date);
+        
+        // studytime -> findAll -> study_id = req.params.studyId
+        const user_studytime = await models.studytime.findAll({
+            attributes: ['user_id', 'studytime'],
+            where: {
                 study_id: req.params.studyId,
-                total_penalty: 0
-            })
-        }
-        res.send({code:"200"})
-    } catch(err){
-        res.send({code:"400"})
+                date: {
+                    [Op.eq]: date 
+                } 
+            },
+            order: [ 'user_id' ]
+        })
+        res.send({"code":200, user_studytime})
+    } catch(err)
+    {
+        res.send({"code":400})
         console.log(err)
         next(err)
     }
 })
+
 module.exports = router;
