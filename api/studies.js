@@ -326,7 +326,7 @@ router.patch('/time/:addr', async (req, res, next) => {
 router.post('/time/:studyId', async (req, res, next) => {    
     try{
         const date = new Date(req.body.date);
-        
+        date.setUTCHours(0, 0, 0, 0);
         // studytime -> findAll -> study_id = req.params.studyId
         const user_studytime = await models.studytime.findAll({
             attributes: ['user_id', 'studytime'],
@@ -346,5 +346,6 @@ router.post('/time/:studyId', async (req, res, next) => {
         next(err)
     }
 })
+
 
 module.exports = router;
