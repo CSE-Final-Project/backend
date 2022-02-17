@@ -45,6 +45,21 @@ router.post('/', async (req, res, next) => {
     }
 })
 
+// study 삭제
+router.delete('/setting/:studyId', async (req, res, next) => {
+    try{
+        // delete study 
+        const study = await models.study.destroy({
+            where: { id: req.params.studyId }
+        })
+        res.send({"code":200})
+    }catch(err){
+        res.send({"code":400})
+        console.log(err)
+        next(err)
+    }
+})
+
 // study 가입
 router.post('/join', async (req, res, next) => {
     // try-catch 안 쓰면 error
