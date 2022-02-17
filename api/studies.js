@@ -3,8 +3,6 @@ const router = express.Router()
 const models = require('../models/index')
 const { v4: uuidV4 } = require('uuid');
 const Sequelize = require('sequelize');
-const { route } = require('./users');
-const { sequelize } = require('../models/index');
 const Op = Sequelize.Op;
 
 // 전체 study 조회
