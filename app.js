@@ -46,6 +46,7 @@ app.use(function(req, res, next){
 // API
 app.use('/api/users', require('./api/users'));
 app.use('/api/studies', require('./api/studies'));
+app.use('/api/rankings', require('./api/rankings'));
 
 // Socket IO
 const io = require('socket.io')(server, {
