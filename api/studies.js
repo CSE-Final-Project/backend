@@ -8,7 +8,7 @@ const Op = Sequelize.Op;
 // 전체 study 조회
 router.get('/', async (req, res, next) => {
     const studies = await models.study.findAll({
-        attributes: ['id', 'leader', 'title', 'target_time', 'penalty', 'info']
+        attributes: ['id', 'leader', 'title', 'topic','target_time', 'member_number','penalty', 'is_recruit', 'info']
     })
     console.log(studies)
     res.json(studies);
