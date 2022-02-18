@@ -4,19 +4,24 @@ const models = require('../models/index')
 const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
 
-router.get('/studies', async (req, res, next) => {
-    
+router.get('/studies', async (req, res, next) => { 
     try {
-        let today = new Date();
-        today.setUTCHours(0, 0, 0, 0);
+        let yesterday = new Date();
+        yesterday.setUTCHours(0, 0, 0, 0);
+        yesterday.setDate(yesterday.getDate() - 1);
 
-        const top3 = await models.studytime.findAll({
-            attributes: ['study_id', [Sequelize.literal(`SUM(studytime)`), 'study_time'] ],
-            where: { date: { [Op.eq]: today } },
-            group: ['study_id'],
-            limit: 3
+        const ranking = await models.studyavgtime.findAll({
+            attributes: ['study_id', 'avg_time' ],
+            where: { date : { [Op.eq]: yesterday } },
+            order: [['avg_time', 'DESC']],
+            raw: true,
         })
-    res.send({"code":200, top3})
+
+        let index=1
+        for( r of ranking ){
+            r['rank'] = index++
+        }    
+        res.send({"code":200, ranking})
     } catch(err){
         res.send({"code":400})
         console.log(err)
