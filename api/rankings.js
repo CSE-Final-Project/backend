@@ -4,6 +4,7 @@ const models = require('../models/index')
 const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
 
+// Study Ranking of Yesterday
 router.get('/studies', async (req, res, next) => { 
     try {
         let yesterday = new Date();
@@ -18,10 +19,10 @@ router.get('/studies', async (req, res, next) => {
         })
 
         let index=1
-        for( r of ranking ){
-            r['rank'] = index++
-        }    
+        for( r of ranking ){ r['rank'] = index++ }
+
         res.send({"code":200, ranking})
+
     } catch(err){
         res.send({"code":400})
         console.log(err)
