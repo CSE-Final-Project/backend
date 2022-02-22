@@ -53,8 +53,9 @@ const io = require('socket.io')(server, {
 require("./socket.js")(io);
 
 app.use(cors({
-    origin: 'https://10.200.148.175:3000', //
-    credentials: true
+    origin: process.env.CLIENT_ORIGIN,
+    credentials: true,
+    methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"]
 }))
 
 const schedule = require('node-schedule');
