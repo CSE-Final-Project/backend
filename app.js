@@ -6,12 +6,7 @@ const fs = require('fs') //
 
 // Https
 const https = require('https') //
-const server = https.createServer({
-    key: fs.readFileSync('./private.pem'),
-    cert: fs.readFileSync('./public.pem'),
-    requestCert: false,
-    rejectUnauthorized: false
-}, app)
+const server = https.createServer(app)
 
 // DB
 const models = require("./models/index.js");
@@ -66,7 +61,7 @@ const schedule = require('node-schedule');
 const { QueryTypes } = require('sequelize');
 
 // Studytime Initialize
-const studytime_init_time = '43 15 * * *'
+const studytime_init_time = '55 12 * * *'
 const studytime_init = schedule.scheduleJob(studytime_init_time, async () => {
     let query =
     `SELECT user_id, study_id FROM user_studies`
