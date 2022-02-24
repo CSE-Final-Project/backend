@@ -46,14 +46,14 @@ app.use('/', require('./api/test'));
 // Socket IO
 const io = require('socket.io')(server, {
     cors: {
-        origin: "https://nudo.ml:8000", //
-        methods: ["GET","POST"]
+       origin: "https://www.neodu-studydo.tk:443", //
+       methods: ["GET","POST"]
     }
 })
 require("./socket.js")(io);
 
 app.use(cors({
-    origin: process.env.CLIENT_ORIGIN | "https://nudo.ml:8000",
+    origin: process.env.CLIENT_ORIGIN | "https://www.neodu-studydo.tk:443",
     credentials: true,
     methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"]
 }))

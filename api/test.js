@@ -6,4 +6,6 @@ router.get('/', async (req, res, next) => {
     res.send("THIS IS NUDO BACKEND SERVER");
 })
 
+
 module.exports = router;
+
