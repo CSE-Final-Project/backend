@@ -62,7 +62,7 @@ const schedule = require('node-schedule');
 const { QueryTypes } = require('sequelize');
 
 // Studytime Initialize
-const studytime_init_time = '55 12 * * *'
+const studytime_init_time = '01 00 * * *'
 const studytime_init = schedule.scheduleJob(studytime_init_time, async () => {
     let query =
     `SELECT user_id, study_id FROM user_studies`
@@ -83,7 +83,7 @@ const studytime_init = schedule.scheduleJob(studytime_init_time, async () => {
 })
 
 // Attendance Check + Penalty Update
-const attendance_check_time = '41 41 16 * * *'
+const attendance_check_time = '59 23 * * *'
 const attendance_check = schedule.scheduleJob(attendance_check_time, async () => {
     let query =
     `SELECT user_id, study_id, target_time, studytime FROM studytimes
@@ -126,6 +126,34 @@ const attendance_check = schedule.scheduleJob(attendance_check_time, async () =>
                 { where: { user_id: i.user_id, study_id: i.study_id } }
             )
         }
+    }
+})
+
+// Ranking of average studytime
+const ranking_check_time = '59 23 * * *'
+const ranking_check = schedule.scheduleJob(ranking_check_time, async () => {
+
+    let today = new Date("2022-02-17");
+    today.setUTCHours(0, 0, 0, 0);
+
+    const id_studytime = await models.studytime.findAll({
+        attributes: ['study_id', [Sequelize.literal(`SUM(studytime)`), 'study_time'] ],
+        where: { date: { [Op.eq]: today } },
+        group: ['study_id'],
+    }).then(accounts => accounts.map(account => [account.study_id, account.dataValues.study_time]));
+
+    for (i of id_studytime){
+        const study = await models.study.findOne({
+            attribute: ['member_number'],
+            where : { id: i[0] },
+        })
+
+        const cal = Math.floor(i[1]/parseInt(study.member_number))
+        const studyavgtime = await models.studyavgtime.create({
+            study_id: i[0],
+            avg_time: cal,
+            date: today
+        })
     }
 })
 

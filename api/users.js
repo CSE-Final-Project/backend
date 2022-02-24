@@ -64,8 +64,10 @@ router.get('/logout', async (req, res, next) => {
     try{
         console.log('logout', req.session.id)
         req.session.destroy();
-        res.redirect('/api/users');
+        res.clearCookie(options.name);
+        res.send({code:"200", msg:"logout"})
     } catch (err){
+        res.send({code:"400"})
         console.error(err);
         next(err);
     }
