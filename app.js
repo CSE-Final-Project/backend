@@ -2,11 +2,10 @@ const cors = require('cors')
 const express = require('express')
 const bodyParser = require('body-parser')
 const app = express()
-const fs = require('fs') //
 
-// Https
-const https = require('https') //
-const server = https.createServer(app)
+// Http
+const http = require('http') //
+const server = http.createServer(app)
 
 // DB
 const models = require("./models/index.js");
@@ -42,18 +41,19 @@ app.use(function(req, res, next){
 app.use('/api/users', require('./api/users'));
 app.use('/api/studies', require('./api/studies'));
 app.use('/api/rankings', require('./api/rankings'));
+app.use('/', require('./api/test'));
 
 // Socket IO
 const io = require('socket.io')(server, {
     cors: {
-        origin: "https://10.200.148.175:3000", //
+        origin: "https://nudo.ml:8000", //
         methods: ["GET","POST"]
     }
 })
 require("./socket.js")(io);
 
 app.use(cors({
-    origin: process.env.CLIENT_ORIGIN,
+    origin: process.env.CLIENT_ORIGIN | "https://nudo.ml:8000",
     credentials: true,
     methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"]
 }))
@@ -132,4 +132,5 @@ const attendance_check = schedule.scheduleJob(attendance_check_time, async () =>
 // Port setting
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 server.listen(process.env.PORT || 8000, () => console.log('server port 8000'));
+
 
