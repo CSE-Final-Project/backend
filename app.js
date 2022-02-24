@@ -2,16 +2,10 @@ const cors = require('cors')
 const express = require('express')
 const bodyParser = require('body-parser')
 const app = express()
-const fs = require('fs') //
 
-// Https
-const https = require('https') //
-const server = https.createServer({
-    key: fs.readFileSync('./private.pem'),
-    cert: fs.readFileSync('./public.pem'),
-    requestCert: false,
-    rejectUnauthorized: false
-}, app)
+// Http
+const http = require('http') //
+const server = http.createServer(app)
 
 // DB
 const models = require("./models/index.js");
@@ -47,19 +41,21 @@ app.use(function(req, res, next){
 app.use('/api/users', require('./api/users'));
 app.use('/api/studies', require('./api/studies'));
 app.use('/api/rankings', require('./api/rankings'));
+app.use('/', require('./api/test'));
 
 // Socket IO
 const io = require('socket.io')(server, {
     cors: {
-        origin: "https://10.200.148.175:3000", //
-        methods: ["GET","POST"]
+       origin: "https://www.neodu-studydo.tk:443", //
+       methods: ["GET","POST"]
     }
 })
 require("./socket.js")(io);
 
 app.use(cors({
-    origin: 'https://10.200.148.175:3000', //
-    credentials: true
+    origin: process.env.CLIENT_ORIGIN | "https://www.neodu-studydo.tk:443",
+    credentials: true,
+    methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"]
 }))
 
 const schedule = require('node-schedule');
@@ -68,7 +64,7 @@ const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
 
 // Studytime Initialize
-const studytime_init_time = '43 15 * * *'
+const studytime_init_time = '55 12 * * *'
 const studytime_init = schedule.scheduleJob(studytime_init_time, async () => {
     let query =
     `SELECT user_id, study_id FROM user_studies`
@@ -166,4 +162,5 @@ const ranking_check = schedule.scheduleJob(ranking_check_time, async () => {
 // Port setting
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 server.listen(process.env.PORT || 8000, () => console.log('server port 8000'));
+
 
