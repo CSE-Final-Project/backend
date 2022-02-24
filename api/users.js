@@ -43,6 +43,7 @@ router.post('/login', async (req, res, next) => {
                     id: id,
                     is_logined: true
                 }
+                req.session.save()
                 res.send({code:"200", msg:"login", id:id})
             }
             else {
@@ -64,7 +65,7 @@ router.get('/logout', async (req, res, next) => {
     try{
         console.log('logout', req.session.id)
         req.session.destroy();
-        res.clearCookie(options.name);
+        res.clearCookie('connect.sid')
         res.send({code:"200", msg:"logout"})
     } catch (err){
         res.send({code:"400"})
