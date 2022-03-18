@@ -2,6 +2,7 @@ const cors = require('cors')
 const express = require('express')
 const bodyParser = require('body-parser')
 const app = express()
+const fs = require('fs')
 
 // Http
 // const http = require('http') 
@@ -10,10 +11,9 @@ const app = express()
 // Https
 const https = require('https')
 const server = https.createServer({
-    key: fs.readFileSync('./private.pem'),
-    cert: fs.readFileSync('./public.pem'),
-    requestCert: false,
-    rejectUnauthorized: false
+    key: fs.readFileSync('key.pem', 'utf-8'),
+    cert: fs.readFileSync('cert.pem', 'utf-8'),
+    passphrase: 'phrase'
 }, app)
 
 
@@ -56,14 +56,14 @@ app.use('/', require('./api/test'));
 // Socket IO
 const io = require('socket.io')(server, {
     cors: {
-       origin: "https://10.200.148.175:3000", // "https://www.neodu-studydo.tk:443",
+       origin: "https://localhost:3000", // "https://www.neodu-studydo.tk:443",
        methods: ["GET","POST"]
     }
 })
 require("./socket.js")(io);
 
 app.use(cors({
-    origin: 'https://10.200.148.175:3000', // process.env.CLIENT_ORIGIN | "https://www.neodu-studydo.tk:443",
+    origin: 'https://localhost:3000', // process.env.CLIENT_ORIGIN | "https://www.neodu-studydo.tk:443",
     credentials: true,
     methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"]
 }))
