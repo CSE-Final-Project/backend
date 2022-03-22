@@ -22,7 +22,7 @@ const FileStore = require('session-file-store')(session);
 var fileStoreOptions = {path: './sessions/'};
 app.use(session({
     httpOnly: true,	//자바스크립트를 통해 세션 쿠키를 사용할 수 없도록 함
-    secure: ture,
+    secure: true,
     store: new FileStore(fileStoreOptions),
     secret: 'keyboard cat',
     resave: false,
