@@ -353,7 +353,11 @@ router.post('/time/:studyId', async (req, res, next) => {
 // 해당 스터디의 게시글 목록
 router.get('/:studyId/board', async(req, res, next) => {
     // post DB에서 study_id = {:studyId} 있는 모든 post 목록 (idx 순서대로) 
-    
+    const posts = await models.post.findAll({
+        attributes: ['idx', 'user_id', 'study_id', 'date', 'title', 'content', 'comments']
+    })
+    console.log(posts)
+    res.send(posts)
 })
 
 // 게시글 작성
@@ -362,33 +366,74 @@ router.post('/:studyId/board', async(req, res, next) => {
     // req.body.title
     // req.body.content
 
-    // NEW post
-    idx = 오름차순
-    user_id = req.session.user.id
-    study_id = req.params.studyId
-    date = server 에서 처리
-    title = req.body.title
-    content = req.body.content
-    comment = 0 (생성시 default)
+    if (req.session.user !== undefined){
 
+           // NEW post
+
+    // idx = 오름차순
+    // user_id = req.session.user.id
+    // study_id = req.params.studyId
+    // date = server 에서 처리
+    // title = req.body.title
+    // content = req.body.content
+    // comment = 0 (생성시 default)
+
+        const new_post = await models.post.create({
+            user_id: req.session.user.id ,
+            study_id: req.params.studyId,
+            date: new Date(),
+            title: req.body.title,
+            content: req.body.content
+        })
+
+        console.log(new_post) // for check
+        res.send({code:"200", msg:"create_success"})
+    }
+    else{
+        res.send({code:"400", msg:"login_first"})
+    }
 })
 
 // 게시글 상세 화면
 router.get('/:studyId/board/:idx', async(req, res, next) => {
     
     // post DB에서 idx={:idx} 인 post  전달
+    try {
+        // find post where idx= req.params.idx
 
-    // NEW post
-    idx = 
-    user_id = 
-    study_id = 
-    date = 
-    title =
-    content = 
-    comment =
+        const post = await models.post.findOne({
+            where: {    idx: req.params.idx     }
+        })
 
-    // comment DB에서 post_id={:idx}인 comment 전체 전달
+        console.log("post")
+        console.log(post)   // for check
+    
+        if (post.length == 0){
+            res.send({code:"400", msg:"nonexistent_post"}) 
+        }
+        else{
+            // after -> in comment DB,  FIND_ALL : post_id={:idx}인 comment
+            try{
+                const comment = await models.post.findAll({
+                    attributes: ['user_id', 'content', 'date'],
+                    where: {post_id: idx},
+                    order: ['idx']
+                })
 
+                console.log("comment")
+                console.log(comment)   // for check
+
+                res.send({post: post, comment: comment})
+
+            }catch(err){
+                console.error(err);
+                next(err);
+            }
+        }
+    }catch(err){
+        console.error(err);
+        next(err);
+    }
 })
 
 
@@ -397,8 +442,8 @@ router.put('/:studyId/board/:idx', async(req, res, next) => {
     
     // post DB에서 {:idx}인 post 에서 아래 사항
 
-    req.body.title
-    req.body.content
+    // req.body.title
+    // req.body.content
     
     // 수정
 
@@ -420,10 +465,10 @@ router.post('/:studyId/board/:idx/comment', async(req, res, next) => {
     
     // comment
 
-    idx = 알아서 increasement
-    user_id = req.session.user.id
-    post_id = req.params.idx
-    content = req.body.content
+    // idx = 알아서 increasement
+    // user_id = req.session.user.id
+    // post_id = req.params.idx
+    // content = req.body.content
 
     // res.send({code:"200", msg:"success"})
 
