@@ -3,6 +3,7 @@ const router = express.Router()
 const models = require('../models/index')
 const { v4: uuidV4 } = require('uuid');
 const Sequelize = require('sequelize');
+const { Server } = require('socket.io');
 const Op = Sequelize.Op;
 
 // 전체 study 조회
@@ -345,5 +346,101 @@ router.post('/time/:studyId', async (req, res, next) => {
     }
 })
 
+// 
+// Study board //
+// 
+
+// 해당 스터디의 게시글 목록
+router.get('/:studyId/board', async(req, res, next) => {
+    // post DB에서 study_id = {:studyId} 있는 모든 post 목록 (idx 순서대로) 
+    
+})
+
+// 게시글 작성
+router.post('/:studyId/board', async(req, res, next) => {
+    // req.params.studyId
+    // req.body.title
+    // req.body.content
+
+    // NEW post
+    idx = 오름차순
+    user_id = req.session.user.id
+    study_id = req.params.studyId
+    date = server 에서 처리
+    title = req.body.title
+    content = req.body.content
+    comment = 0 (생성시 default)
+
+})
+
+// 게시글 상세 화면
+router.get('/:studyId/board/:idx', async(req, res, next) => {
+    
+    // post DB에서 idx={:idx} 인 post  전달
+
+    // NEW post
+    idx = 
+    user_id = 
+    study_id = 
+    date = 
+    title =
+    content = 
+    comment =
+
+    // comment DB에서 post_id={:idx}인 comment 전체 전달
+
+})
+
+
+// 게시글 수정
+router.put('/:studyId/board/:idx', async(req, res, next) => {
+    
+    // post DB에서 {:idx}인 post 에서 아래 사항
+
+    req.body.title
+    req.body.content
+    
+    // 수정
+
+})
+
+// 게시글 삭제
+router.delete('/:studyId/board/:idx', async(req, res, next) => {
+    
+    // post DB에서 {:idx}인 delete 예시
+
+    // post DB idx로 게시글 찾기
+    // 만약 post의 user_id == req.session.user.id 이면 게시글 삭제
+    // 그렇지 않다면, res.send("400","권한 없음")
+
+})
+
+// 게시글 댓글 작성
+router.post('/:studyId/board/:idx/comment', async(req, res, next) => {
+    
+    // comment
+
+    idx = 알아서 increasement
+    user_id = req.session.user.id
+    post_id = req.params.idx
+    content = req.body.content
+
+    // res.send({code:"200", msg:"success"})
+
+})
+
+// 게시글 댓글 삭제
+router.delete('/:studyId/board/:idx/comment/:number', async(req, res, next) => {
+    
+    // comment id = req.params.number
+
+    // comment DB 
+    // find comment with ** req.params.number **
+
+    // if comment.user_id == req.session.user.id -> comment 삭제
+
+    // else
+    // res.send({code:"400", msg:"access denied"})
+})
 
 module.exports = router;

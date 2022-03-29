@@ -10,10 +10,10 @@
 - 게시글 삭제
 ## /api/studeis/{:studyId}/board/{:idx}/comment [POST]
 - 게시글 댓글 작성
-## /api/studeis/{:studyId}/board/{:idx}/comment/{:number} [PUT]
-- 게시글 댓글 수정
+## /api/studeis/{:studyId}/board/{:idx}/comment/{:number} [PUT] 
+- 게시글 댓글 수정 (X)
 ## /api/studeis/{:studyId}/board/{:idx}/comment/{:number} [DELETE]
-- 게시글 댓글 삭제
+- 게시글 댓글 삭제 
 
 ## /api/studeis/{:studyId}/board [GET] 
 - 해당 스터디의 게시글 목록
