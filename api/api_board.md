@@ -20,8 +20,13 @@
 
 - [req]
 - req.parameter
-1. studyId : 스터디 id
+1. studyId : 스터디 ids
 
+(ex)
+
+```
+https://localhost:8000/api/studies/study1/board
+```
 - [res]
 1) 성공 (작성일 최신순으로 정렬)
 {
@@ -32,6 +37,21 @@
     "date": "2022-02-16 07:24:02", // 작성일
     "comments": "1" // 댓글 수 
 }
+
+(ex)  
+```
+[
+    {
+        "idx": 1,
+        "user_id": "aaaa",
+        "study_id": "study1",
+        "date": "2022-04-08T00:00:00.000Z",
+        "title": "post1",
+        "content": "helloworld",
+        "comments": 0
+    }
+]
+```
 
 ## /api/studeis/{:studyId}/board [POST]
 - 게시글 작성
@@ -54,8 +74,21 @@
 
 - [res]
 1) 성공
+- code
+```
+{
+    "code": "200",
+    "msg": "create_success"
+}
+```
 - redirect ( 게시글 상세화면 ) ` /api/studeis/{:studyId}/board/{:idx}  `
-
+2) 실패 1 - `login first`
+```
+{
+    "code": "400",
+    "msg": "login_first"
+}
+```
 ## /api/studeis/{:studyId}/board/{:idx} [GET] 
 - 게시글 상세 화면
 - [req]
@@ -93,7 +126,24 @@
     ]
 }
 
-## /api/studeis/{:studyId}/board/{:idx} [PUT]
+```
+{
+    "post": {
+        "idx": 1,
+        "user_id": "aaaa",
+        "study_id": "study1",
+        "date": "2022-04-08T00:00:00.000Z",
+        "title": "post1",
+        "content": "helloworld",
+        "comments": 0,
+        "createdAt": "2022-04-08T00:00:00.000Z",
+        "updatedAt": null
+    },
+    "comment": []
+}
+```
+
+## /api/studeis/{:studyId}/board/{:idx} [PATCH]
 - 게시글 수정
 - [req]
 - req.parameter
@@ -105,15 +155,25 @@
     "title"="", [string]
     "content"="", [string]
 }
-
+```
+https://localhost:8000/api/studies/study1/board/1
+```
 - (ex)
+```
 {
-    "title":"3/18 excused absence",
-    "content":"I have test tomorrow. Can I take excused absence? "
+    "title": "today is May 5",
+    "content": "today is May 5"
 }
+```
 
 - [res]
-1) 성공  {   code="200", msg="success"   }
+1) 성공
+```
+{
+    "code": "200",
+    "msg": "update_success"
+}
+```
 - redirect 게시글 상세 화면  `/api/studeis/{:studyId}/board/{:idx} [GET] `
 
 ## /api/studeis/{:studyId}/board/{:idx} [DELETE]
@@ -122,9 +182,18 @@
 - req.parameter
 1. studyId : 스터디 id
 2. idx : 게시글 idx
+```
+https://localhost:8000/api/studies/study1/board/1
+```
 
 - [res]
-1) 성공  {   code="200", msg="success"   }
+1) 성공
+```
+{
+    "code": "200",
+    "msg": "delete_success"
+}
+```
 - redirect 게시글 목록 `/api/studeis/{:studyId}/board [GET] `
 
 

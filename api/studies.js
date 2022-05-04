@@ -387,7 +387,9 @@ router.post('/:studyId/board', async(req, res, next) => {
         })
 
         console.log(new_post) // for check
-        res.send({code:"200", msg:"create_success"})
+        res.send({code:"200", msg:"create_success"}) 
+        // NEXT TO DO => REDIRECT !!
+         
     }
     else{
         res.send({code:"400", msg:"login_first"})
@@ -396,7 +398,6 @@ router.post('/:studyId/board', async(req, res, next) => {
 
 // 게시글 상세 화면
 router.get('/:studyId/board/:idx', async(req, res, next) => {
-    
     // post DB에서 idx={:idx} 인 post  전달
     try {
         // find post where idx= req.params.idx
@@ -414,9 +415,9 @@ router.get('/:studyId/board/:idx', async(req, res, next) => {
         else{
             // after -> in comment DB,  FIND_ALL : post_id={:idx}인 comment
             try{
-                const comment = await models.post.findAll({
+                const comment = await models.comment.findAll({
                     attributes: ['user_id', 'content', 'date'],
-                    where: {post_id: idx},
+                    where: {    post_id:  req.params.idx    },
                     order: ['idx']
                 })
 
@@ -436,9 +437,8 @@ router.get('/:studyId/board/:idx', async(req, res, next) => {
     }
 })
 
-
 // 게시글 수정
-router.put('/:studyId/board/:idx', async(req, res, next) => {
+router.patch('/:studyId/board/:idx', async(req, res, next) => {
     
     // post DB에서 {:idx}인 post 에서 아래 사항
 
@@ -446,18 +446,69 @@ router.put('/:studyId/board/:idx', async(req, res, next) => {
     // req.body.content
     
     // 수정
+    if (req.session.user !== undefined){
 
+        const post = await models.post.findOne({
+            where: {    idx: req.params.idx     }
+        })
+
+        if (post.dataValues.user_id != req.session.user.id){
+            // ACCESS ERROR
+            res.send({code:"400", msg:"access_denied"}) 
+        }
+        else{
+            try{
+                const result = await models.post.update(
+                    {   title: req.body.title,
+                        content: req.body.content   },
+                    { where :  {   idx : req.params.idx    }}
+                )
+
+                console.log(result)
+
+                res.send({code:"200", msg:"update_success"}) 
+
+            }catch(err){
+                next(err)
+            }
+        }
+ }
+ else{
+    res.send({code:"400", msg:"login_first"})
+ }
 })
 
 // 게시글 삭제
-router.delete('/:studyId/board/:idx', async(req, res, next) => {
-    
-    // post DB에서 {:idx}인 delete 예시
+router.delete('/:studyId/board/:idx', async(req, res, next) => {    
+    // login first
+    if (req.session.user !== undefined){
+        
+        // post DB idx로 게시글 찾기
+        const post = await models.post.findOne({
+            where: {    idx: req.params.idx     }
+        })
 
-    // post DB idx로 게시글 찾기
-    // 만약 post의 user_id == req.session.user.id 이면 게시글 삭제
-    // 그렇지 않다면, res.send("400","권한 없음")
-
+        // 만약 post의 user_id == req.session.user.id 이면 게시글 삭제
+        if (post.dataValues.user_id != req.session.user.id){
+            // ACCESS ERROR
+            res.send({code:"400", msg:"access_denied"}) 
+        }
+        else{
+            // ACCESS OK
+            try{
+                const result = await models.post.destroy(
+                    { where :  {   idx : req.params.idx    }}
+                )
+                res.send({code:"200", msg:"delete_success"}) 
+            }catch(err){
+                next(err)
+            }
+        }
+    }
+    else{
+        // 그렇지 않다면, res.send("400","권한 없음")
+        res.send({code:"400", msg:"login_first"})
+    }
 })
 
 // 게시글 댓글 작성
