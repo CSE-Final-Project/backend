@@ -405,11 +405,8 @@ router.get('/:studyId/board/:idx', async(req, res, next) => {
         const post = await models.post.findOne({
             where: {    idx: req.params.idx     }
         })
-
-        console.log("post")
-        console.log(post)   // for check
     
-        if (post.length == 0){
+        if (post == null){
             res.send({code:"400", msg:"nonexistent_post"}) 
         }
         else{
@@ -513,30 +510,101 @@ router.delete('/:studyId/board/:idx', async(req, res, next) => {
 
 // 게시글 댓글 작성
 router.post('/:studyId/board/:idx/comment', async(req, res, next) => {
-    
-    // comment
-
-    // idx = 알아서 increasement
-    // user_id = req.session.user.id
-    // post_id = req.params.idx
-    // content = req.body.content
-
-    // res.send({code:"200", msg:"success"})
-
+    // - login 안하면 접근 불가
+    if (req.session.user !== undefined){
+        // user 가 해당 study 내부 인원인지 확인
+        const check = await models.user_study.findOne({ 
+            where: {
+                user_id: req.session.user.id,
+                study_id: req.params.studyId
+            } 
+        }) 
+        
+        // 댓글 작성
+        if (check !== null){
+            const new_comment = await models.comment.create({
+                user_id: req.session.user.id,
+                post_id: req.params.idx,
+                content: req.body.content,
+                date: new Date(),
+            })
+            
+            console.log(new_comment)
+            res.send({code:"200", msg:"success"})
+        }
+        else{
+            // 접근 제어
+            res.send({code:"400", msg:"access_denied"})             
+        }           
+    }
+    else{
+        res.send({code:"400", msg:"login_first"})
+    }
 })
+
+// 게시글 댓글 수정
+router.patch('/:studyId/board/:idx/comment/:number', async(req, res, next) => {
+     // - login 안하면 접근 불가
+     if (req.session.user !== undefined){
+
+        // user가 작성한 댓글인지 확인
+        const check = await models.comment.findOne({ 
+            where: {
+                idx: req.params.number,
+                user_id : req.session.user.id
+            } 
+        })
+
+        // 댓글 수정
+        if (check !== null){
+            const result = await models.comment.update(
+                { content: req.body.content   },
+                { where :  {   idx : req.params.number    }}
+            )
+            
+            console.log(result)
+            res.send({code:"200", msg:"success"})
+        }
+        else{
+            // 접근 제어
+            res.send({code:"400", msg:"access_denied"})  
+        }
+     }else{
+        res.send({code:"400", msg:"login_first"})
+    }
+} )
 
 // 게시글 댓글 삭제
 router.delete('/:studyId/board/:idx/comment/:number', async(req, res, next) => {
-    
-    // comment id = req.params.number
+    // - login 안하면 접근 불가
+    if (req.session.user !== undefined){
 
-    // comment DB 
-    // find comment with ** req.params.number **
+        // user가 작성한 댓글인지 확인
+        const check = await models.comment.findOne({ 
+            where: {
+                idx: req.params.number,
+                user_id : req.session.user.id
+            } 
+        })
 
-    // if comment.user_id == req.session.user.id -> comment 삭제
-
-    // else
-    // res.send({code:"400", msg:"access denied"})
+        // 댓글 삭제
+        if (check !== null){
+            try{
+                const result = await models.comment.destroy(
+                    { where :  {   idx : req.params.number    }}
+                )
+                res.send({code:"200", msg:"delete_success"}) 
+            }catch(err){
+                next(err)
+            }
+        }else{
+            // 접근 제어
+            res.send({code:"400", msg:"access_denied"})  
+        }
+    }
+    else{
+        res.send({code:"400", msg:"login_first"})
+    }
 })
 
 module.exports = router;

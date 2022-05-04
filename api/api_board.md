@@ -101,47 +101,37 @@ https://localhost:8000/api/studies/study1/board
 - 게시글 정보(post)와 모든 댓글 정보(comments)
 
 (ex)
-{
-    "post":{
-        "user_id":"aaaa",
-        "title":"3/18 excused absence",
-        "content":"I have test tomorrow. Can I take excused absence? ",
-        "date":"2022-02-16 07:24:02",
-        "comments":2 // 댓글 수 
-
-    },
-    "comments":[
-        {
-            "idx"="1",  // comment idx
-            "user_id":"bbb",
-            "content":"Sure",
-            "date":"2022-02-16 07:24:02"
-        },
-        {
-            "idx"="3",  // comment idx
-            "user_id":"cccc",
-            "content":"OK",
-            "date":"2022-02-16 07:24:02"
-        }
-    ]
-}
 
 ```
 {
     "post": {
-        "idx": 1,
+        "idx": 2,
         "user_id": "aaaa",
         "study_id": "study1",
-        "date": "2022-04-08T00:00:00.000Z",
-        "title": "post1",
-        "content": "helloworld",
+        "date": "2022-04-08T07:38:16.000Z",
+        "title": "today is May 5",
+        "content": "today is May 5",
         "comments": 0,
-        "createdAt": "2022-04-08T00:00:00.000Z",
-        "updatedAt": null
+        "createdAt": "2022-04-08T07:38:16.000Z",
+        "updatedAt": "2022-05-04T17:52:51.000Z"
     },
-    "comment": []
+    "comment": [
+        {
+            "user_id": "aaaa",
+            "content": "Day for Children",
+            "date": "2022-05-04T18:04:10.000Z"
+        }
+    ]
 }
 ```
+2) 실패 1 : 존재하지 않는 게시물
+```
+{
+    "code": "400",
+    "msg": "nonexistent_post"
+}
+```
+
 
 ## /api/studeis/{:studyId}/board/{:idx} [PATCH]
 - 게시글 수정
@@ -199,7 +189,9 @@ https://localhost:8000/api/studies/study1/board/1
 
 ## /api/studeis/{:studyId}/board/{:idx}/comment [POST]
 - 게시글 댓글 작성
-
+```
+https://localhost:8000/api/studies/study1/board/2/comment
+```
 - [req]
 - req.parameter
 1. studyId : 스터디 id
@@ -209,19 +201,30 @@ https://localhost:8000/api/studies/study1/board/1
 {   "content" [string]  }
 
 - (ex)
+```
 {
-    "content": "Of course"
+    "content": "Day for Children"
 }
+```
 
 - [res]
-1) 성공  {   code="200", msg="success"   }
+1) 성공
+```
+{
+    "code": "200",
+    "msg": "success"
+}
+```
 - redirect 게시글 상세 화면 `/api/studeis/{:studyId}/board/{:idx} [GET] `
-2) 실패 1: 내용이 비어있다 {code="400", msg="empty"}
-3) 실패 2: 글자 수 제한 {code="400", msg="over 1000"}
+
+<!--2) 실패 1: 내용이 비어있다 {code="400", msg="empty"}-->
+<!--3) 실패 2: 글자 수 제한 {code="400", msg="over 1000"}-->
 
 ## /api/studeis/{:studyId}/board/{:idx}/comment/{:number} [PUT]
 - 게시글 댓글 수정
-
+```
+https://localhost:8000/api/studies/study1/board/2/comment/1
+```
 - [req]
 - req.parameter
 1. studyId : 스터디 id
@@ -232,18 +235,29 @@ https://localhost:8000/api/studies/study1/board/1
 {   "content" [string]    }
 
 - (ex)
+```
 {
-    "content": "Sure"
+    "content": "Summer"
 }
+```
 
 - [res]
-1) 성공 {   code="200", msg="success"   }
+1) 성공
+```
+{
+    "code": "200",
+    "msg": "success"
+}
+```
 - redirect 게시글 상세 화면 `/api/studeis/{:studyId}/board/{:idx} [GET] `
 
-2) 실패 1: {   code="200", msg="error"   }
+<!--2) 실패 1: {   code="200", msg="error"   }-->
 
 ## /api/studeis/{:studyId}/board/{:idx}/comment/{:number} [DELETE]
 - 게시글 댓글 삭제
+```
+https://localhost:8000/api/studies/study1/board/2/comment/4
+```
 - [req]
 - req.parameter
 1. studyId : 스터디 id
@@ -251,7 +265,17 @@ https://localhost:8000/api/studies/study1/board/1
 3. number : 게시글 댓글 idx
 
 - [res]
-1) 성공 {   code="200", msg="success"   }
+1) 성공 
+```
+{
+    "code": "200",
+    "msg": "delete_success"
+}
+```
 - redirect 게시글 상세 화면 `/api/studeis/{:studyId}/board/{:idx} [GET] `
 
-2) 실패 1: {   code="200", msg="error"   }
+2) 실패
+```
+{code:"400", msg:"access_denied"}
+{code:"400", msg:"login_first"}
+```
