@@ -4,6 +4,7 @@ const models = require('../models/index')
 const { v4: uuidV4 } = require('uuid');
 const Sequelize = require('sequelize');
 const { Server } = require('socket.io');
+const e = require('cors');
 const Op = Sequelize.Op;
 
 // 전체 study 조회
@@ -289,7 +290,8 @@ router.delete('/setting/:studyId', async (req, res, next) => {
 router.patch('/time/:addr', async (req, res, next) => {
     try {
         // find studyId from addr
-        const studyId = await models.study.findOne({
+        const studyId = await models.study.findAll({
+            attribute: ['id'],
             where: {addr:req.params.addr}
         })
 
@@ -299,9 +301,11 @@ router.patch('/time/:addr', async (req, res, next) => {
 
         // find studytime ( userId, studyId, today )
         const today_study = await models.studytime.findOne({
-            where: { study_id: studyId.id , user_id: req.session.user.id, date: { [Op.eq]: today } }
+            where: { study_id: studyId[0].id , user_id: req.session.user.id, date: { [Op.eq]: today } }
         })
         
+        console.log(today)
+
         // add
         let update_time = today_study.studytime + req.body.study_time
 
@@ -312,7 +316,7 @@ router.patch('/time/:addr', async (req, res, next) => {
         )
         
         // SUCCESS
-        res.send({code:"200"})
+        res.send({code: result})
 
     } catch(err){
         res.send({code:"400"})
@@ -604,6 +608,46 @@ router.delete('/:studyId/board/:idx/comment/:number', async(req, res, next) => {
     }
     else{
         res.send({code:"400", msg:"login_first"})
+    }
+})
+
+// 스터디 leader
+router.get('/:studyId/leader', async(req, res, next)=> {
+    const who_is_leader = await models.study.findOne({ 
+        where: {
+            id: req.params.studyId, // req. body에 studyId 로 study id 넣어주기
+        } 
+    })
+
+    if  (who_is_leader !== null){
+        res.send({ code:"200", leader: who_is_leader.leader })  
+    }
+    else{
+        res.send({code:"400", msg:"access_denied"})  
+    }
+})
+
+// 벌금 정산
+router.post('/:studyId/penalty', async(req, res, next) => {
+     // user 가 해당 study leader인지 확인
+     const check = await models.study.findOne({ 
+        where: {
+            id: req.params.studyId,
+            leader: req.body.user_id, // post 에서 body 부분에 user_id 넣어주기
+        } 
+    })
+
+    if (check !== null){ 
+        const penalty_paid = await models.penalty.update(
+            { total_penalty: 0   },
+            { where :  {   user_id : req.body.penalty_user_id,
+                                study_id : req.params.studyId    }}
+        )
+        res.send({code:"200", msg:"update_success"})  
+    }        
+    else{
+        // 권한 없음
+        res.send({code:"400", msg:"access_denied"})  
     }
 })
 
